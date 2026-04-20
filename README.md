@@ -2,6 +2,10 @@
 
 A Chrome extension that lets you pick any text elements on a webpage and instantly translate them into a ready-to-use CSV with **English** and **Indonesian** columns — powered by [Claude AI](https://anthropic.com).
 
+
+https://github.com/user-attachments/assets/b185eca6-6a14-4b4f-848e-791d264ccc5a
+
+
 ---
 
 ## ✨ Features
