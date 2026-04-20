@@ -200,17 +200,28 @@
     </style>
   </head>
   <body>
-    <h1>🌐 Claude Translate</h1>
+    <h1>🌐 Translate UI</h1>
     <p>Collect text from any page, translate all at once, export to Excel.</p>
 
     <label>AI Provider</label>
     <div class="provider-selector">
       <div class="provider-option">
-        <input type="radio" name="provider" id="provider-anthropic" value="anthropic" checked />
+        <input
+          type="radio"
+          name="provider"
+          id="provider-anthropic"
+          value="anthropic"
+          checked
+        />
         <label for="provider-anthropic">Anthropic Claude</label>
       </div>
       <div class="provider-option">
-        <input type="radio" name="provider" id="provider-github" value="github" />
+        <input
+          type="radio"
+          name="provider"
+          id="provider-github"
+          value="github"
+        />
         <label for="provider-github">GitHub Copilot</label>
       </div>
     </div>
@@ -249,7 +260,8 @@
         Create token at
         <a href="https://github.com/settings/tokens?type=beta" target="_blank"
           >github.com/settings/tokens</a
-        > (classic or fine-grained)
+        >
+        (classic or fine-grained)
       </div>
     </div>
 

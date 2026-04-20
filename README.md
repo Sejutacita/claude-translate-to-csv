@@ -1,4 +1,4 @@
-# Claude Translate to CSV
+# Translate UI to CSV
 
 A Chrome extension that lets you pick any text elements on a webpage and instantly translate them into a ready-to-use CSV with **English** and **Indonesian** columns — powered by AI (Anthropic Claude or GitHub Copilot).
 
@@ -33,7 +33,7 @@ https://github.com/user-attachments/assets/b185eca6-6a14-4b4f-848e-791d264ccc5a
 1. **Clone or download this repository**
 
    ```bash
-   git clone https://github.com/devnazir/claude-translate-to-csv.git
+   git clone https://github.com/Sejutacita/translate-ui-to-csv.git
    ```
 
    Or download the ZIP from GitHub and extract it.
@@ -58,7 +58,7 @@ https://github.com/user-attachments/assets/b185eca6-6a14-4b4f-848e-791d264ccc5a
 5. **Pin the extension** _(optional but recommended)_
 
    - Click the 🧩 puzzle icon in the Chrome toolbar
-   - Click the 📌 pin icon next to **Claude Translate to CSV**
+   - Click the 📌 pin icon next to **Translate UI to CSV**
 
 ---
 
