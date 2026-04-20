@@ -23,6 +23,7 @@
         <span class="ct-panel-title">Claude Translate</span>
         <button class="ct-panel-close" title="Close">✕</button>
       </div>
+      <div class="ct-provider-badge" id="ct-provider-badge">Loading...</div>
 
       <div class="ct-section-label">1 · Pick mode</div>
       <button class="ct-pick-btn" id="ct-pick-btn">Start clicking elements</button>
@@ -53,6 +54,23 @@
       </button>
     `;
     document.body.appendChild(panel);
+
+    // Load and display provider info
+    chrome.runtime.sendMessage({ type: "GET_SETTINGS" }, (settings) => {
+      const provider = settings?.provider || "anthropic";
+      const badge = panel.querySelector("#ct-provider-badge");
+      if (badge) {
+        if (provider === "github") {
+          badge.textContent = "Using: GitHub Copilot";
+          badge.style.background = "#0d1117";
+          badge.style.color = "#58a6ff";
+        } else {
+          badge.textContent = "Using: Anthropic Claude";
+          badge.style.background = "#2d1810";
+          badge.style.color = "#d4a574";
+        }
+      }
+    });
 
     const langGrid = panel.querySelector("#ct-langs");
 

@@ -4,19 +4,27 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     return true;
   }
   if (message.type === "GET_SETTINGS") {
-    chrome.storage.sync.get(["apiKey"], sendResponse);
+    chrome.storage.sync.get(["provider", "apiKey", "githubToken"], sendResponse);
     return true;
   }
 });
 
 async function doTranslate(items, languages) {
-  const settings = await chrome.storage.sync.get(["apiKey"]);
-  const apiKey = settings.apiKey;
+  const settings = await chrome.storage.sync.get(["provider", "apiKey", "githubToken"]);
+  const provider = settings.provider || "anthropic";
+  
+  // Route to appropriate provider
+  if (provider === "github") {
+    return await translateWithGitHub(items, languages, settings.githubToken);
+  } else {
+    return await translateWithAnthropic(items, languages, settings.apiKey);
+  }
+}
 
+async function translateWithAnthropic(items, languages, apiKey) {
   if (!apiKey || apiKey.length < 10) {
     return {
-      error:
-        "No API key set. Click the extension icon (🌐) to enter your Anthropic API key.",
+      error: "No Anthropic API key set. Click the extension icon (🌐) to enter your API key.",
     };
   }
 
@@ -27,8 +35,87 @@ async function doTranslate(items, languages) {
   });
 
   const sourceJson = JSON.stringify(sourceObj, null, 2);
+  const prompt = buildPrompt(sourceJson);
 
-  const prompt = `You are a professional localization engineer.
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 2048,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      return { error: err.error?.message || "API error. Check your API key." };
+    }
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || "";
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    return { result: parsed };
+  } catch (e) {
+    return { error: `Failed: ${e.message}` };
+  }
+}
+
+async function translateWithGitHub(items, languages, githubToken) {
+  if (!githubToken || githubToken.length < 10) {
+    return {
+      error: "No GitHub token set. Click the extension icon (🌐) to enter your token.",
+    };
+  }
+
+  const sourceObj = {};
+  items.forEach((text, i) => {
+    const key = textToKey(text, i);
+    sourceObj[key] = text;
+  });
+
+  const sourceJson = JSON.stringify(sourceObj, null, 2);
+  const prompt = buildPrompt(sourceJson);
+
+  try {
+    const response = await fetch("https://models.inference.ai.azure.com/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${githubToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 2048,
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      return { error: err.error?.message || err.message || "API error. Check your token." };
+    }
+
+    const data = await response.json();
+    const raw = data.choices?.[0]?.message?.content || "";
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    return { result: parsed };
+  } catch (e) {
+    return { error: `Failed: ${e.message}` };
+  }
+}
+
+function buildPrompt(sourceJson) {
+  return `You are a professional localization engineer.
 
 Translate all values in the source JSON into English (en) and Indonesian (id).
 
@@ -60,36 +147,6 @@ Rules:
   * Apply this to BOTH the English and Indonesian translations.
   * Example: "Hello, Nazir 👋" → "Hello, {{name}} 👋" and "Halo, {{name}} 👋"
   * Example: "Overview of NAZIR DEVELOPMENT" → "Overview of {{company}}" and "Gambaran umum {{company}}"`;
-
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 2048,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-
-    if (!response.ok) {
-      const err = await response.json();
-      return { error: err.error?.message || "API error. Check your API key." };
-    }
-
-    const data = await response.json();
-    const raw = data.content?.[0]?.text || "";
-    const clean = raw.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
-    return { result: parsed };
-  } catch (e) {
-    return { error: `Failed: ${e.message}` };
-  }
 }
 
 function textToKey(text, index) {

@@ -149,27 +149,108 @@
       .how b {
         color: #666;
       }
+      .provider-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .provider-option {
+        flex: 1;
+        position: relative;
+      }
+      .provider-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .provider-option label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: none;
+        letter-spacing: normal;
+        margin: 0;
+      }
+      .provider-option input[type="radio"]:checked + label {
+        background: #f0a500;
+        border-color: #f0a500;
+        color: #111;
+      }
+      .provider-option label:hover {
+        border-color: #3a3a3a;
+      }
+      .provider-option input[type="radio"]:checked + label:hover {
+        border-color: #f0a500;
+      }
+      .credential-section {
+        display: none;
+      }
+      .credential-section.active {
+        display: block;
+      }
     </style>
   </head>
   <body>
     <h1>🌐 Claude Translate</h1>
     <p>Collect text from any page, translate all at once, export to Excel.</p>
 
-    <label>Anthropic API Key</label>
-    <div class="input-wrap">
-      <input
-        type="password"
-        id="key"
-        placeholder="sk-ant-api03-…"
-        autocomplete="off"
-      />
-      <button class="show-btn" id="show">Show</button>
+    <label>AI Provider</label>
+    <div class="provider-selector">
+      <div class="provider-option">
+        <input type="radio" name="provider" id="provider-anthropic" value="anthropic" checked />
+        <label for="provider-anthropic">Anthropic Claude</label>
+      </div>
+      <div class="provider-option">
+        <input type="radio" name="provider" id="provider-github" value="github" />
+        <label for="provider-github">GitHub Copilot</label>
+      </div>
     </div>
-    <div class="hint">
-      Get your key at
-      <a href="https://console.anthropic.com" target="_blank"
-        >console.anthropic.com</a
-      >
+
+    <div class="credential-section active" id="anthropic-section">
+      <label>Anthropic API Key</label>
+      <div class="input-wrap">
+        <input
+          type="password"
+          id="anthropic-key"
+          placeholder="sk-ant-api03-…"
+          autocomplete="off"
+        />
+        <button class="show-btn" id="show-anthropic">Show</button>
+      </div>
+      <div class="hint">
+        Get your key at
+        <a href="https://console.anthropic.com" target="_blank"
+          >console.anthropic.com</a
+        >
+      </div>
+    </div>
+
+    <div class="credential-section" id="github-section">
+      <label>GitHub Personal Access Token</label>
+      <div class="input-wrap">
+        <input
+          type="password"
+          id="github-token"
+          placeholder="ghp_... or github_pat_..."
+          autocomplete="off"
+        />
+        <button class="show-btn" id="show-github">Show</button>
+      </div>
+      <div class="hint">
+        Create token at
+        <a href="https://github.com/settings/tokens?type=beta" target="_blank"
+          >github.com/settings/tokens</a
+        > (classic or fine-grained)
+      </div>
     </div>
 
     <button class="save-btn" id="save">Save</button>

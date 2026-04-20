@@ -12,7 +12,8 @@
   ],
   "host_permissions": [
     "<all_urls>",
-    "https://api.anthropic.com/*"
+    "https://api.anthropic.com/*",
+    "https://models.inference.ai.azure.com/*"
   ],
   "background": {
     "service_worker": "background.js"
